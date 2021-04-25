@@ -33,8 +33,7 @@ func main() {
 
 	//dependency injection
 	appEngine := controllers.AppEngine{
-		Session:     sess,
-		Credentials: creds,
+		Session: sess,
 	}
 
 	//routing
