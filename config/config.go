@@ -1,3 +1,5 @@
 package config
 
-const()
+const (
+	SESSION_KEY = "passphrasewhichneedstobe32bytes!"
+)

@@ -28,27 +28,25 @@
         <h2>Login</h2>
         <p>Please fill in your credentials to login.</p>
 
-        <?php 
-        if(!empty($login_err)){
-            echo '<div class="alert alert-danger">' . $login_err . '</div>';
-        }       
-        ?>
+        {{if .login_err_bool}}
+        <div class="alert alert-danger"> {{.login_err}} </div>
+        {{end}}
 
         <form action="/" method="post">
             <div class="form-group">
                 <label>ID</label>
-                <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
-                <span class="invalid-feedback"><?php echo $username_err; ?></span>
+                <input type="text" name="username" class="form-control {{if .username_err_bool}}is-invalid{{end}}" value="{{if .username_filled}}{{.username}}{{end}}">
+                <span class="invalid-feedback">{{.username_err}}</span>
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
-                <span class="invalid-feedback"><?php echo $password_err; ?></span>
+                <input type="password" name="password" class="form-control {{if .password_err_bool}}is-invalid{{end}}">
+                <span class="invalid-feedback">{{.password_err}}</span>
             </div>
             <div class="form-group">
                 <input type="submit" class="btn btn-primary" value="Login">
             </div>
-            <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
+            <p>Don't have an account? <a href="/register">Sign up now</a>.</p>
         </form>
     </div>
 </body>
