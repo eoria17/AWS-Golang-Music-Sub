@@ -110,28 +110,4 @@ func (ae AppEngine) Login(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	t.ExecuteTemplate(w, "login", data)
-
-	// loginGet(w, r)
-}
-
-func loginGet(w http.ResponseWriter, r *http.Request) {
-
-	viewPage := "views/login.html"
-	assetsUrl := "http://" + r.Host + "/assets/"
-
-	t, _ := template.ParseFiles(viewPage)
-
-	data := map[string]interface{}{
-		"assets":            assetsUrl,
-		"username_err_bool": false,
-		"password_err_bool": false,
-		"username_err":      "",
-		"password_err":      "",
-		"login_err":         "",
-		"login_err_bool":    false,
-		"username_filled":   false,
-	}
-
-	w.WriteHeader(http.StatusOK)
-	t.ExecuteTemplate(w, "login", data)
 }
