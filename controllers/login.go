@@ -5,24 +5,27 @@ import (
 	"net/http"
 	"text/template"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"github.com/eoria17/AWS-Golang-Music-Sub/models"
-	//"github.com/gorilla/sessions"
+	"github.com/eoria17/AWS-Golang-Music-Sub/config"
+	"github.com/gorilla/sessions"
 )
 
-// var (
-// 	key   = []byte(config.SESSION_KEY)
-// 	store = sessions.NewCookieStore(key)
-// )
+var (
+	key   = []byte(config.SESSION_KEY)
+	store = sessions.NewCookieStore(key)
+)
 
 func (ae AppEngine) Login(w http.ResponseWriter, r *http.Request) {
 
-	// session, err := store.Get(r, "user_name")
-	// if err != nil {
-	// 	//redirect to main page
-	// }
+	session, err := store.Get(r, "user_cookie")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//if logged in
+	if auth, ok := session.Values["logged_in"].(bool); ok || auth {
+		http.Redirect(w, r, "http://"+r.Host+"/home", http.StatusPermanentRedirect)
+		return
+	}
 
 	viewPage := "views/login.html"
 	assetsUrl := "http://" + r.Host + "/assets/"
@@ -43,7 +46,7 @@ func (ae AppEngine) Login(w http.ResponseWriter, r *http.Request) {
 		//check if username or password is null
 		if r.FormValue("username") == "" {
 			username_err_bool = true
-			username_err = "Please enter username."
+			username_err = "Please enter email."
 		} else {
 			username_filled = true
 			username = r.FormValue("username")
@@ -56,38 +59,24 @@ func (ae AppEngine) Login(w http.ResponseWriter, r *http.Request) {
 
 		//search DB for login data
 		if !username_err_bool && !password_err_bool {
-			svc := dynamodb.New(ae.Session)
 
-			result, err := svc.GetItem(&dynamodb.GetItemInput{
-				TableName: aws.String("login"),
-				Key: map[string]*dynamodb.AttributeValue{
-					"user_name": {
-						S: aws.String(r.FormValue("username")),
-					},
-				},
-			})
-
-			if err != nil {
-				fmt.Println("here", err)
-			}
-
-			if result.Item == nil {
-				login_err = "invalid username or password"
-			}
-
-			user := models.Login{}
-			err = dynamodbattribute.UnmarshalMap(result.Item, &user)
-
-			if err != nil {
-				panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
-			}
+			user := ae.GetCurrentUser(r.FormValue("username"))
 
 			if user.Password != r.FormValue("password") {
 				login_err = "invalid username or password"
 				login_err_bool = true
 			} else if user.Password == r.FormValue("password") {
-				fmt.Println("meep")
-				//redirect to home page
+				session.Values["logged_in"] = true
+				session.Values["email"] = user.Email
+
+				err = session.Save(r, w)
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				//redirect to home
+				http.Redirect(w, r, "http://"+r.Host+"/home", http.StatusPermanentRedirect)
+				return
 			}
 
 		}
