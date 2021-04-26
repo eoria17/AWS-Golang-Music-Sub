@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/eoria17/AWS-Golang-Music-Sub/config"
 )
 
@@ -35,14 +36,19 @@ func main() {
 	//dynamoDB AWS client
 	svc := dynamodb.New(sess)
 
+	//S3 AWS client
+	//s3c := s3.New(sess)
+	s3uploader := s3manager.NewUploader(sess)
+
 	//dependency injection
 	appEngine := controllers.AppEngine{
-		Session:        sess,
 		DynamoDBClient: svc,
+		S3Client:       s3uploader,
 	}
 
 	//routing
 	appEngine.Route(router)
+	appEngine.DataSeed()
 
 	//serve public as static file
 	router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("./public/"))))

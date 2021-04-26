@@ -13,3 +13,7 @@ type Song struct {
 	WebURL string `json:"web_url"`
 	ImgURL string `json:"img_url"`
 }
+
+type A2 struct {
+	Songs []Song `json:"songs"`
+}

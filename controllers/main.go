@@ -6,7 +6,7 @@ import (
 	"text/template"
 )
 
-func (ae AppEngine) Home(w http.ResponseWriter, r *http.Request) {
+func (ae AppEngine) Main(w http.ResponseWriter, r *http.Request) {
 
 	session, err := store.Get(r, "user_cookie")
 	if err != nil {
@@ -19,7 +19,7 @@ func (ae AppEngine) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	viewPage := "views/home.html"
+	viewPage := "views/main.html"
 	assetsUrl := "http://" + r.Host + "/assets/"
 	user := ae.GetCurrentUser(session.Values["email"].(string))
 
@@ -31,5 +31,5 @@ func (ae AppEngine) Home(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	t.ExecuteTemplate(w, "home", data)
+	t.ExecuteTemplate(w, "main", data)
 }
