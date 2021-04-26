@@ -13,16 +13,18 @@ import (
 )
 
 type AppEngine struct {
-	Session *session.Session
+	Session        *session.Session
+	DynamoDBClient *dynamodb.DynamoDB
 }
 
 func (ae AppEngine) Route(r *mux.Router) {
 	r.HandleFunc("/", ae.Login)
 	r.HandleFunc("/home", ae.Home)
+	r.HandleFunc("/register", ae.Register)
 }
 
 func (ae AppEngine) GetCurrentUser(username string) models.Login {
-	svc := dynamodb.New(ae.Session)
+	svc := ae.DynamoDBClient
 
 	result, err := svc.GetItem(&dynamodb.GetItemInput{
 		TableName: aws.String("login"),
@@ -38,10 +40,13 @@ func (ae AppEngine) GetCurrentUser(username string) models.Login {
 	}
 
 	user := models.Login{}
-	err = dynamodbattribute.UnmarshalMap(result.Item, &user)
 
-	if err != nil {
-		panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
+	if result != nil {
+		err = dynamodbattribute.UnmarshalMap(result.Item, &user)
+
+		if err != nil {
+			panic(fmt.Sprintf("Failed to unmarshal Record, %v", err))
+		}
 	}
 
 	return user

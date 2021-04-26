@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/eoria17/AWS-Golang-Music-Sub/config"
 )
 
@@ -31,9 +32,13 @@ func main() {
 	//create router handler
 	router := mux.NewRouter()
 
+	//dynamoDB AWS client
+	svc := dynamodb.New(sess)
+
 	//dependency injection
 	appEngine := controllers.AppEngine{
-		Session: sess,
+		Session:        sess,
+		DynamoDBClient: svc,
 	}
 
 	//routing

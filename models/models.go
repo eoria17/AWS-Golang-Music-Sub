@@ -1,9 +1,9 @@
 package models
 
 type Login struct {
-	Email     string
-	User_name string
-	Password  string
+	Email     string `json:"email"`
+	User_name string `json:"user_name"`
+	Password  string `json:"password"`
 }
 
 type Song struct {
